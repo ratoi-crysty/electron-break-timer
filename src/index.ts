@@ -8,7 +8,7 @@ import * as path from 'path';
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: BrowserWindow | null;
 let notificationsWindow: BrowserWindow | null;
-let tray: Tray;
+let tray: Tray | null;
 
 const isDevMode = process.execPath.match(/[\\/]electron/);
 
@@ -36,12 +36,19 @@ const createWindow = () => {
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
+    console.log('Main closed');
+
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
+    if (mainWindow && browserWindows.indexOf(mainWindow) !== -1) {
+      console.log('Remove main');
+      browserWindows.splice(browserWindows.indexOf(mainWindow), 1);
+    }
     mainWindow = null;
-    if (mainWindow && browserWindows.indexOf(mainWindow)) {
-      browserWindows.splice(browserWindows.indexOf(mainWindow));
+
+    if (tray && !browserWindows.length) {
+      tray.destroy();
     }
   });
 
@@ -70,20 +77,28 @@ const createWindow = () => {
   // and load the index.html of the app.
   notificationsWindow.loadURL(`file://${__dirname}/windows/notifications/notifications.html`);
 
-  // Open the DevTools.
+  // // Open the DevTools.
   // if (isDevMode) {
   //   notificationsWindow.webContents.openDevTools();
   // }
 
-
   // Emitted when the window is closed.
   notificationsWindow.on('closed', () => {
+    console.log('Notifications closed');
+
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
+    if (notificationsWindow && browserWindows.indexOf(notificationsWindow) !== -1) {
+      console.log('Remove notifications');
+
+      browserWindows.splice(browserWindows.indexOf(notificationsWindow), 1);
+    }
     notificationsWindow = null;
-    if (notificationsWindow && browserWindows.indexOf(notificationsWindow)) {
-      browserWindows.splice(browserWindows.indexOf(notificationsWindow));
+    if (tray && !browserWindows.length) {
+      tray.destroy();
+      tray = null;
+      console.log('Remove tray');
     }
   });
 
@@ -109,6 +124,7 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
+  console.log('All closed');
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {

@@ -9,6 +9,8 @@ import 'rxjs/add/operator/do';
 export class NotificationsService {
   private static channelNameNotification = 'notifications';
   private static channelNameNotificationClicked = 'notifications-clicked';
+  private static channelNameCloseNotifications = 'notifications-close-notifications';
+  private static channelNameCloseWindow = 'notifications-close-window';
 
   constructor(private communicationService: CommunicationService) {
   }
@@ -27,5 +29,21 @@ export class NotificationsService {
 
   listenForNotificationsClicked(): Observable<null> {
     return this.communicationService.listenToChannel(NotificationsService.channelNameNotificationClicked);
+  }
+
+  closeAllNotifications() {
+    this.communicationService.send(NotificationsService.channelNameCloseNotifications, null);
+  }
+
+  listenForCloseAllNotifications() {
+    return this.communicationService.listenToChannel(NotificationsService.channelNameCloseNotifications);
+  }
+
+  closeWindow() {
+    this.communicationService.send(NotificationsService.channelNameCloseWindow, null);
+  }
+
+  listenForCloseWindow() {
+    return this.communicationService.listenToChannel(NotificationsService.channelNameCloseWindow);
   }
 }

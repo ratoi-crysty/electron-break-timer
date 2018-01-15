@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NotificationsService } from '../../notifications/services/notifications.service';
 import { Observable } from 'rxjs/Observable';
-import { NotificationModel } from '../../notifications/models/notification.model';
+import { NotificationModel, NotificationTypes } from '../../notifications/models/notification.model';
 import { ElectronService } from 'ngx-electron';
 
 @Component({
@@ -20,10 +20,17 @@ export class MainWindowComponent implements OnInit {
   }
 
   notify() {
-    this.notificationsService.sendNotification(new NotificationModel('Title', 'description'));
+    this.notificationsService.sendNotification(
+      new NotificationModel('Break reminder', 'It\'s time for a quick break', NotificationTypes.warning)
+    );
   }
 
   hideWindow() {
     this.electronService.remote.getCurrentWindow().hide();
+  }
+
+  closeWindow() {
+    this.notificationsService.closeWindow();
+    this.electronService.remote.getCurrentWindow().close();
   }
 }
