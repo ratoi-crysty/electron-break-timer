@@ -18,6 +18,7 @@ export class TimerComponent implements OnInit {
 
   @Output() showNotification = new EventEmitter();
   @Output() hideWindow = new EventEmitter();
+  @Output() timeStart = new EventEmitter();
   @Input() restart$: Observable<null>;
 
   constructor() { }
@@ -42,6 +43,7 @@ export class TimerComponent implements OnInit {
 
     this.tick();
     this.interval = setInterval(this.tick.bind(this), 1000);
+    this.timeStart.emit(this.minutes);
   }
 
   stop() {

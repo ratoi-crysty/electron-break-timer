@@ -3,12 +3,14 @@ import * as electron from 'electron';
 import { enableLiveReload } from 'electron-compile';
 import nodeCommunicationService from './app/communication/node/node-communication.service';
 import * as path from 'path';
+import * as moment from 'moment';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: BrowserWindow | null;
 let notificationsWindow: BrowserWindow | null;
 let tray: Tray | null;
+const browserWindows: BrowserWindow[] = [];
 
 const isDevMode = process.execPath.match(/[\\/]electron/);
 
@@ -16,13 +18,24 @@ if (isDevMode) {
   enableLiveReload();
 }
 
-const createWindow = () => {
-  const browserWindows: BrowserWindow[] = [];
+const destroyEverything = () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.destroy();
+  }
+  if (notificationsWindow && !notificationsWindow.isDestroyed()) {
+    notificationsWindow.destroy();
+  }
+  if (tray && !tray.isDestroyed()) {
+    tray.destroy();
+  }
+  browserWindows.splice(0);
+};
 
+const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 250,
+    height: 250,
   });
   browserWindows.push(mainWindow);
 
@@ -31,25 +44,12 @@ const createWindow = () => {
 
   // Open the DevTools.
   if (isDevMode) {
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
-    console.log('Main closed');
-
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    if (mainWindow && browserWindows.indexOf(mainWindow) !== -1) {
-      console.log('Remove main');
-      browserWindows.splice(browserWindows.indexOf(mainWindow), 1);
-    }
-    mainWindow = null;
-
-    if (tray && !browserWindows.length) {
-      tray.destroy();
-    }
+    destroyEverything();
   });
 
   notificationsWindow = new BrowserWindow({
@@ -65,8 +65,8 @@ const createWindow = () => {
     alwaysOnTop: true,
     show: false,
     resizable: false,
-    maximizable: false,
-    minimizable: false,
+    // maximizable: false,
+    // minimizable: false,
   });
   // notificationsWindow = new BrowserWindow({
   //   width: 800,
@@ -77,30 +77,10 @@ const createWindow = () => {
   // and load the index.html of the app.
   notificationsWindow.loadURL(`file://${__dirname}/windows/notifications/notifications.html`);
 
-  // // Open the DevTools.
+  // Open the DevTools.
   // if (isDevMode) {
   //   notificationsWindow.webContents.openDevTools();
   // }
-
-  // Emitted when the window is closed.
-  notificationsWindow.on('closed', () => {
-    console.log('Notifications closed');
-
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    if (notificationsWindow && browserWindows.indexOf(notificationsWindow) !== -1) {
-      console.log('Remove notifications');
-
-      browserWindows.splice(browserWindows.indexOf(notificationsWindow), 1);
-    }
-    notificationsWindow = null;
-    if (tray && !browserWindows.length) {
-      tray.destroy();
-      tray = null;
-      console.log('Remove tray');
-    }
-  });
 
   nodeCommunicationService.onInitMain(ipcMain, browserWindows);
 
@@ -112,9 +92,20 @@ const createWindow = () => {
 
     mainWindow.show();
   });
-  // tray.setContextMenu(Menu.buildFromTemplate([
-  //   { label: 'Show' }
-  // ]));
+
+  nodeCommunicationService.listenToChannel('timer-started')
+    .subscribe(
+      (minutes: number) => {
+        if (!tray) {
+          return;
+        }
+
+        console.log(minutes);
+
+        const newBreakDate = moment().add(minutes, 'minutes');
+        tray.setToolTip(`Next break on ${newBreakDate.format('HH:mm:ss')}`);
+      }
+    );
 };
 
 // This method will be called when Electron has finished

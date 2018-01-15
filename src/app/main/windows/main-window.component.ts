@@ -3,6 +3,8 @@ import { NotificationsService } from '../../notifications/services/notifications
 import { Observable } from 'rxjs/Observable';
 import { NotificationModel, NotificationTypes } from '../../notifications/models/notification.model';
 import { ElectronService } from 'ngx-electron';
+import { CommunicationService } from '../../communication/services/communication.service';
+import { CommunicationDataModel } from '../../communication/models/communication-data.model';
 
 @Component({
   moduleId : module.id.split('\\').join('/'),
@@ -13,7 +15,9 @@ import { ElectronService } from 'ngx-electron';
 export class MainWindowComponent implements OnInit {
   notificationClick$: Observable<null>;
 
-  constructor(private notificationsService: NotificationsService, private electronService: ElectronService) { }
+  constructor(private notificationsService: NotificationsService,
+              private electronService: ElectronService,
+              private communicationService: CommunicationService) { }
 
   ngOnInit() {
     this.notificationClick$ = this.notificationsService.listenForNotificationsClicked();
@@ -32,5 +36,9 @@ export class MainWindowComponent implements OnInit {
   closeWindow() {
     this.notificationsService.closeWindow();
     this.electronService.remote.getCurrentWindow().close();
+  }
+
+  sendTimeStart(minutes: number) {
+    this.communicationService.send(new CommunicationDataModel('timer-started', minutes, false));
   }
 }

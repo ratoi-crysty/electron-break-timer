@@ -6,16 +6,18 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import { CommunicationDataModel } from '../models/communication-data.model';
 import { ElectronService } from 'ngx-electron';
+import { BaseCommunicationService } from '../util/base-communication.service';
 
 @Injectable()
-export class CommunicationService {
+export class CommunicationService extends BaseCommunicationService {
   private communication$: Observable<CommunicationDataModel>;
 
   constructor(private electronService: ElectronService, private ngZone: NgZone) {
+    super();
   }
 
-  send(channel: string, value: any) {
-    this.electronService.ipcRenderer.send('communication-main', new CommunicationDataModel(channel, value));
+  send(data: CommunicationDataModel) {
+    this.electronService.ipcRenderer.send('communication-main', data);
   }
 
   listenToChannel(channel: string): Observable<any> {

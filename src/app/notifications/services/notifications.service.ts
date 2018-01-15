@@ -4,6 +4,7 @@ import { NotificationModel } from '../models/notification.model';
 import { Observable } from 'rxjs/Observable';
 
 import 'rxjs/add/operator/do';
+import { CommunicationDataModel } from '../../communication/models/communication-data.model';
 
 @Injectable()
 export class NotificationsService {
@@ -16,7 +17,8 @@ export class NotificationsService {
   }
 
   sendNotification(notification: NotificationModel) {
-    this.communicationService.send(NotificationsService.channelNameNotification, notification);
+    this.communicationService
+      .send(new CommunicationDataModel(NotificationsService.channelNameNotification, notification));
   }
 
   listenForNotifications(): Observable<NotificationModel> {
@@ -24,7 +26,8 @@ export class NotificationsService {
   }
 
   notificationClicked() {
-    this.communicationService.send(NotificationsService.channelNameNotificationClicked, null);
+    this.communicationService
+      .send(new CommunicationDataModel(NotificationsService.channelNameNotificationClicked, null));
   }
 
   listenForNotificationsClicked(): Observable<null> {
@@ -32,7 +35,7 @@ export class NotificationsService {
   }
 
   closeAllNotifications() {
-    this.communicationService.send(NotificationsService.channelNameCloseNotifications, null);
+    this.communicationService.send(new CommunicationDataModel(NotificationsService.channelNameCloseNotifications, null));
   }
 
   listenForCloseAllNotifications() {
@@ -40,7 +43,7 @@ export class NotificationsService {
   }
 
   closeWindow() {
-    this.communicationService.send(NotificationsService.channelNameCloseWindow, null);
+    this.communicationService.send(new CommunicationDataModel(NotificationsService.channelNameCloseWindow, null));
   }
 
   listenForCloseWindow() {
