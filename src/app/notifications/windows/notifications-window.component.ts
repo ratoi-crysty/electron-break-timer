@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewContainerRef } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Component, OnDestroy, OnInit, ViewContainerRef } from '@angular/core';
 import { NotificationsService } from '../services/notifications.service';
 import { NotificationModel, NotificationTypes } from '../models/notification.model';
 import { Toast, ToastsManager } from 'ng2-toastr';
 import * as electron from 'electron';
 import { ElectronService } from 'ngx-electron';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   moduleId : module.id.split('\\').join('/'),
@@ -12,9 +12,9 @@ import { ElectronService } from 'ngx-electron';
   templateUrl: './notifications-window.component.html',
   styleUrls: ['./notifications-window.component.css']
 })
-export class NotificationsWindowComponent implements OnInit {
-  private notificationSubscription: Subscription;
+export class NotificationsWindowComponent implements OnInit, OnDestroy {
   notifications: NotificationModel[] = [];
+  private notificationSubscription: Subscription;
 
   constructor(
     private notificationsService: NotificationsService,
@@ -32,8 +32,10 @@ export class NotificationsWindowComponent implements OnInit {
 
           if (notification.type === NotificationTypes.warning) {
             toastMethod = this.toastr.warning.bind(this.toastr);
-          } else {
+          } else if (notification.type === NotificationTypes.success) {
             toastMethod = this.toastr.success.bind(this.toastr);
+          } else {
+            toastMethod = this.toastr.info.bind(this.toastr);
           }
 
           electron.remote.getCurrentWindow().show();
@@ -52,4 +54,7 @@ export class NotificationsWindowComponent implements OnInit {
       );
   }
 
+  ngOnDestroy() {
+    this.notificationSubscription.unsubscribe();
+  }
 }

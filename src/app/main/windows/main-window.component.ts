@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NotificationsService } from '../../notifications/services/notifications.service';
 import { Observable } from 'rxjs/Observable';
-import { NotificationModel, NotificationTypes } from '../../notifications/models/notification.model';
+import { NotificationModel } from '../../notifications/models/notification.model';
 import { ElectronService } from 'ngx-electron';
 import { CommunicationService } from '../../communication/services/communication.service';
 import { CommunicationDataModel } from '../../communication/models/communication-data.model';
@@ -25,7 +25,7 @@ export class MainWindowComponent implements OnInit {
 
   notify() {
     this.notificationsService.sendNotification(
-      new NotificationModel('Break reminder', 'It\'s time for a quick break', NotificationTypes.warning)
+      new NotificationModel('Break reminder', 'It\'s time for a quick break')
     );
   }
 
