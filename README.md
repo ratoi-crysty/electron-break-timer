@@ -7,13 +7,11 @@ cd electron-break-timer
 npm install
 ```
 ## Packaging
-Required npm packages:
-- electron-forge (https://github.com/electron-userland/electron-forge)
 ```sh
-electron-forge package
+./node_modules/.bin/electron-forge package
 ```
 ## Building
 Requirements: same as for packaging
 ```sh
-electron-forge build
+./node_modules/.bin/electron-forge build
 ```
