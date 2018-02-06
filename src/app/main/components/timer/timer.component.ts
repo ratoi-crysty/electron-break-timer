@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { Observable } from 'rxjs/Observable';
+import { MatButton } from '@angular/material';
 
 @Component({
   moduleId : module.id.split('\\').join('/'),
@@ -20,6 +21,8 @@ export class TimerComponent implements OnInit {
   @Output() hideWindow = new EventEmitter();
   @Output() timeStart = new EventEmitter();
   @Input() restart$: Observable<null>;
+  @ViewChild('hideButton') hideButton: MatButton;
+  @ViewChild('input') input: ElementRef;
 
   constructor() { }
 
@@ -44,11 +47,17 @@ export class TimerComponent implements OnInit {
     this.tick();
     this.interval = setInterval(this.tick.bind(this), 1000);
     this.timeStart.emit(this.minutes);
+    setTimeout(() => {
+      this.hideButton.focus();
+    });
   }
 
   stop() {
     clearInterval(this.interval);
     delete this.interval;
+    setTimeout(() => {
+      this.input.nativeElement.focus();
+    });
   }
 
   hide() {

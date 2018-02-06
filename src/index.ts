@@ -68,10 +68,7 @@ const createWindow = () => {
     // maximizable: false,
     // minimizable: false,
   });
-  // notificationsWindow = new BrowserWindow({
-  //   width: 800,
-  //   height: 600,
-  // });
+
   browserWindows.push(notificationsWindow);
 
   // and load the index.html of the app.
@@ -79,6 +76,10 @@ const createWindow = () => {
 
   // Open the DevTools.
   // if (isDevMode) {
+  //   notificationsWindow = new BrowserWindow({
+  //     width: 800,
+  //     height: 600,
+  //   });
   //   notificationsWindow.webContents.openDevTools();
   // }
 
@@ -99,8 +100,6 @@ const createWindow = () => {
         if (!tray) {
           return;
         }
-
-        console.log(minutes);
 
         const newBreakDate = moment().add(minutes, 'minutes');
         tray.setToolTip(`Next break on ${newBreakDate.format('HH:mm:ss')}`);

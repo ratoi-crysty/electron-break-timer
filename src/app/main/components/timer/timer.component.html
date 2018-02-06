@@ -3,13 +3,13 @@
     <h2><span *ngIf="interval">Next break in: <span *ngIf="minutesLeft">{{ minutesLeft }}m</span><span *ngIf="minutesLeft === 0">{{ secondsLeft }}s</span></span>&nbsp;</h2>
     <form>
       <mat-form-field>
-        <input matInput type="number" placeholder="Minutes" name="minutes" required [(ngModel)]="minutes" [disabled]="interval">
+        <input matInput type="number" placeholder="Minutes" name="minutes" required [(ngModel)]="minutes" [disabled]="interval" #input>
       </mat-form-field>
       <div *ngIf="!interval">
         <button mat-button mat-raised-button color="primary" (click)="start()">Start</button>
       </div>
       <div *ngIf="interval">
-        <button mat-button mat-raised-button color="primary" (click)="hide()">Hide</button>
+        <button mat-button mat-raised-button color="primary" (click)="hide()" #hideButton>Hide</button>
         <button mat-button mat-raised-button color="primary" (click)="stop()">Stop</button>
       </div>
     </form>
