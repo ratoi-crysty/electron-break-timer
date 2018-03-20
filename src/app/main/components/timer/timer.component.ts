@@ -1,8 +1,9 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { Observable } from 'rxjs/Observable';
 import { MatButton } from '@angular/material';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   moduleId : module.id.split('\\').join('/'),
@@ -10,16 +11,18 @@ import { MatButton } from '@angular/material';
   templateUrl: './timer.component.html',
   styleUrls: ['./timer.component.css']
 })
-export class TimerComponent implements OnInit {
+export class TimerComponent implements OnInit, OnDestroy {
   secondsLeft: number;
   interval: number;
-  minutes: number;
+  minutes = 60;
+  duration = 5;
   minutesLeft: number;
   nextNotification: Moment;
+  restartSubscription: Subscription;
 
-  @Output() showNotification = new EventEmitter();
-  @Output() hideWindow = new EventEmitter();
-  @Output() timeStart = new EventEmitter();
+  @Output() showNotification = new EventEmitter<number>();
+  @Output() hideWindow = new EventEmitter<void>();
+  @Output() timeStart = new EventEmitter<number>();
   @Input() restart$: Observable<null>;
   @ViewChild('hideButton') hideButton: MatButton;
   @ViewChild('input') input: ElementRef;
@@ -31,6 +34,10 @@ export class TimerComponent implements OnInit {
       .subscribe(
         () => this.start(),
       );
+  }
+
+  ngOnDestroy() {
+    this.restartSubscription.unsubscribe();
   }
 
   start() {
@@ -54,7 +61,7 @@ export class TimerComponent implements OnInit {
 
   stop() {
     clearInterval(this.interval);
-    delete this.interval;
+    this.interval = null;
     setTimeout(() => {
       this.input.nativeElement.focus();
     });
@@ -70,7 +77,7 @@ export class TimerComponent implements OnInit {
 
     if (this.secondsLeft <= 0) {
       this.minutesLeft = this.nextNotification.diff(moment(), 'minutes');
-      this.showNotification.emit();
+      this.showNotification.emit(this.duration);
       this.stop();
     }
   }

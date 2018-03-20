@@ -5,6 +5,9 @@
       <mat-form-field>
         <input matInput type="number" placeholder="Minutes" name="minutes" required [(ngModel)]="minutes" [disabled]="interval" #input>
       </mat-form-field>
+      <mat-form-field>
+        <input matInput type="number" placeholder="Duration" name="Duration" required [(ngModel)]="duration" [disabled]="interval" #input>
+      </mat-form-field>
       <div *ngIf="!interval">
         <button mat-button mat-raised-button color="primary" (click)="start()">Start</button>
       </div>

@@ -34,8 +34,8 @@ const destroyEverything = () => {
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 250,
-    height: 250,
+    width: 415,
+    height: 240,
   });
   browserWindows.push(mainWindow);
 
@@ -69,11 +69,6 @@ const createWindow = () => {
     // minimizable: false,
   });
 
-  browserWindows.push(notificationsWindow);
-
-  // and load the index.html of the app.
-  notificationsWindow.loadURL(`file://${__dirname}/windows/notifications/notifications.html`);
-
   // Open the DevTools.
   // if (isDevMode) {
   //   notificationsWindow = new BrowserWindow({
@@ -82,6 +77,12 @@ const createWindow = () => {
   //   });
   //   notificationsWindow.webContents.openDevTools();
   // }
+
+  browserWindows.push(notificationsWindow);
+
+  // and load the index.html of the app.
+  notificationsWindow.loadURL(`file://${__dirname}/windows/notifications/notifications.html`);
+
 
   nodeCommunicationService.onInitMain(ipcMain, browserWindows);
 

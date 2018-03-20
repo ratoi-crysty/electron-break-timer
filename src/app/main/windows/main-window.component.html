@@ -1,3 +1,6 @@
 <div>
-  <app-timer (showNotification)="notify()" (hideWindow)="hideWindow()" (timeStart)="sendTimeStart($event)" [restart$]="notificationClick$"></app-timer>
+  <app-timer (showNotification)="notify($event)"
+             (hideWindow)="hideWindow()"
+             (timeStart)="sendTimeStart($event)"
+             [restart$]="notificationWindowClosed$"></app-timer>
 </div>

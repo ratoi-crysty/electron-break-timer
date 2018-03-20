@@ -1,12 +1,13 @@
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/share';
+
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { CommunicationDataModel } from '../models/communication-data.model';
 import { ElectronService } from 'ngx-electron';
 import { BaseCommunicationService } from '../util/base-communication.service';
-
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
 
 @Injectable()
 export class CommunicationService extends BaseCommunicationService {
@@ -35,6 +36,7 @@ export class CommunicationService extends BaseCommunicationService {
       this.electronService.ipcRenderer.on('communication-render', (...values: any[]) => {
         this.ngZone.run(() => observer.next(<CommunicationDataModel> values[ 1 ]));
       });
-    });
+    })
+      .share();
   }
 }

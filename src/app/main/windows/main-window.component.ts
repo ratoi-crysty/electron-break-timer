@@ -13,19 +13,19 @@ import { CommunicationDataModel } from '../../communication/models/communication
   styleUrls: ['./main-window.component.css']
 })
 export class MainWindowComponent implements OnInit {
-  notificationClick$: Observable<null>;
+  notificationWindowClosed$: Observable<null>;
 
   constructor(private notificationsService: NotificationsService,
               private electronService: ElectronService,
               private communicationService: CommunicationService) { }
 
   ngOnInit() {
-    this.notificationClick$ = this.notificationsService.listenForNotificationsClicked();
+    this.notificationWindowClosed$ = this.notificationsService.getNotificationWindowClosed$();
   }
 
-  notify() {
+  notify(duration: number) {
     this.notificationsService.sendNotification(
-      new NotificationModel('Break reminder', 'It\'s time for a quick break')
+      new NotificationModel('Break reminder', 'It\'s time for a quick break', duration)
     );
   }
 
