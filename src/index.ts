@@ -31,7 +31,7 @@ const destroyEverything = () => {
   browserWindows.splice(0);
 };
 
-const createWindow = () => {
+const createWindows = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 415,
@@ -54,7 +54,7 @@ const createWindow = () => {
 
   notificationsWindow = new BrowserWindow({
     width: 310,
-    height: 70,
+    height: 80,
     x: electron.screen.getPrimaryDisplay().size.width - 310,
     y: 50,
     transparent: true,
@@ -65,18 +65,19 @@ const createWindow = () => {
     alwaysOnTop: true,
     show: false,
     resizable: false,
+    'node-integration': true,
     // maximizable: false,
     // minimizable: false,
   });
 
   // Open the DevTools.
-  // if (isDevMode) {
-  //   notificationsWindow = new BrowserWindow({
-  //     width: 800,
-  //     height: 600,
-  //   });
-  //   notificationsWindow.webContents.openDevTools();
-  // }
+  if (isDevMode) {
+    // notificationsWindow = new BrowserWindow({
+    //   width: 800,
+    //   height: 600,
+    // });
+    // notificationsWindow.webContents.openDevTools();
+  }
 
   browserWindows.push(notificationsWindow);
 
@@ -86,14 +87,21 @@ const createWindow = () => {
 
   nodeCommunicationService.onInitMain(ipcMain, browserWindows);
 
-  tray = new Tray(path.join(__dirname, 'favicon.ico'));
+  const trayIcon = electron.nativeImage
+    .createFromPath(path.join(__dirname, 'tray.png'));
+
+  tray = new Tray(trayIcon);
   tray.on('click', () => {
     if (!mainWindow || mainWindow.isVisible()) {
+      mainWindow.focus();
+
       return;
     }
 
     mainWindow.show();
   });
+
+  tray.setToolTip('Please set the time until the next break');
 
   nodeCommunicationService.listenToChannel('timer-started')
     .subscribe(
@@ -108,10 +116,14 @@ const createWindow = () => {
     );
 };
 
+const initWindows = () => {
+  setTimeout(() => createWindows(), 1000);
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', initWindows);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -127,7 +139,7 @@ app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
-    createWindow();
+    initWindows();
   }
 });
 
