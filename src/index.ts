@@ -32,6 +32,14 @@ const destroyEverything = () => {
 };
 
 const createWindows = () => {
+  const coffeeBreakIcon = electron.nativeImage
+    .createFromPath(path.join(__dirname, 'assets', 'images', 'coffee-break.png'));
+
+  coffeeBreakIcon.resize({
+    width: 64,
+    height: 64,
+  });
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 415,
@@ -66,6 +74,7 @@ const createWindows = () => {
     show: false,
     resizable: false,
     'node-integration': true,
+    icon: path.join(__dirname, 'save.png_64x64.png'),
     // maximizable: false,
     // minimizable: false,
   });
@@ -87,10 +96,7 @@ const createWindows = () => {
 
   nodeCommunicationService.onInitMain(ipcMain, browserWindows);
 
-  const trayIcon = electron.nativeImage
-    .createFromPath(path.join(__dirname, 'tray.png'));
-
-  tray = new Tray(trayIcon);
+  tray = new Tray(coffeeBreakIcon);
   tray.on('click', () => {
     if (!mainWindow || mainWindow.isVisible()) {
       mainWindow.focus();

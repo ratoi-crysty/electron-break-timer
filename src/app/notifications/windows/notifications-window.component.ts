@@ -1,4 +1,5 @@
 import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/timer';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/switchMap';
@@ -6,6 +7,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/take';
 
 import { Component, OnDestroy, OnInit, ViewContainerRef } from '@angular/core';
 import { NotificationsService } from '../services/notifications.service';
@@ -15,6 +17,7 @@ import * as electron from 'electron';
 import { ElectronService } from 'ngx-electron';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+import * as moment from 'moment';
 
 @Component({
   moduleId: module.id.split('\\').join('/'),
@@ -24,6 +27,10 @@ import { Observable } from 'rxjs/Observable';
 })
 export class NotificationsWindowComponent implements OnInit, OnDestroy {
   private notificationSubscription: Subscription;
+
+  private static formatDateNumber(number: number): string {
+    return `${number < 10 ? '0' : ''}${number}`;
+  }
 
   constructor(private notificationsService: NotificationsService,
               private electronService: ElectronService,
@@ -51,6 +58,26 @@ export class NotificationsWindowComponent implements OnInit, OnDestroy {
     this.notificationSubscription.unsubscribe();
   }
 
+  warningTimer(duration: number): Observable<Toast> {
+    const until = moment().add(duration * 60, 'seconds');
+
+    let toast: Toast;
+
+    return Observable.fromPromise(this.toastr
+      .warning('You should be on break right now', 'Break time', { dismiss: 'controlled' }))
+      .do((_toast: Toast) => toast = _toast)
+      .switchMap(() => Observable.timer(0, 100))
+      .do(() => {
+        const diff = until.diff(moment(), 'seconds') + 1;
+        toast.message = 'You should be on break right now. '
+          + `The break will end in ${NotificationsWindowComponent.formatDateNumber(parseInt(diff / 60, 10))}`
+          + `:${NotificationsWindowComponent.formatDateNumber(diff % 60)}`;
+      })
+      .filter(() => until.diff(moment(), 'seconds') < 0)
+      .do(() => this.toastr.dismissToast(toast))
+      .take(1);
+  }
+
   private openToast(notification: NotificationModel): Observable<Toast> {
     let toastMethod: (message: string, title?: string, options?: any) => Promise<Toast>;
 
@@ -67,9 +94,6 @@ export class NotificationsWindowComponent implements OnInit, OnDestroy {
     return Observable.fromPromise(toastMethod(notification.description, notification.title, { dismiss: 'click' }))
       .combineLatest(this.toastr.onClickToast().first())
       .delay(500)
-      .switchMap(() => <Observable<Toast>> Observable.fromPromise(this.toastr
-        .warning('You should be on break right now', 'Break time', { dismiss: 'controlled' })))
-      .delay(notification.duration * 60000)
-      .do((toast: Toast) => this.toastr.dismissToast(toast));
+      .switchMap(() => this.warningTimer(notification.duration));
   }
 }
