@@ -52,7 +52,7 @@ const createWindows = () => {
 
   // Open the DevTools.
   if (isDevMode) {
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
   }
 
   // Emitted when the window is closed.
@@ -81,11 +81,11 @@ const createWindows = () => {
 
   // Open the DevTools.
   if (isDevMode) {
-    // notificationsWindow = new BrowserWindow({
-    //   width: 800,
-    //   height: 600,
-    // });
-    // notificationsWindow.webContents.openDevTools();
+    notificationsWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+    });
+    notificationsWindow.webContents.openDevTools();
   }
 
   browserWindows.push(notificationsWindow);

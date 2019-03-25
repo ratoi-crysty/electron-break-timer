@@ -44,7 +44,7 @@ export class NotificationsWindowComponent implements OnInit, OnDestroy {
       .switchMap((notification) => this.openToast(notification))
       .subscribe(
         () => {
-          // electron.remote.getCurrentWindow().hide();
+          electron.remote.getCurrentWindow().hide();
           this.notificationsService.notificationWindowClosed();
         }
       );
@@ -61,20 +61,17 @@ export class NotificationsWindowComponent implements OnInit, OnDestroy {
   warningTimer(duration: number): Observable<Toast> {
     const until = moment().add(duration * 60, 'seconds');
 
-    let toast: Toast;
-
     return Observable.fromPromise(this.toastr
       .warning('You should be on break right now', 'Break time', { dismiss: 'controlled' }))
-      .do((_toast: Toast) => toast = _toast)
-      .switchMap(() => Observable.timer(0, 100))
-      .do(() => {
+      .switchMap((toast) => Observable.timer(0, 100).map(() => toast))
+      .do((toast) => {
         const diff = until.diff(moment(), 'seconds') + 1;
         toast.message = 'You should be on break right now. '
-          + `The break will end in ${NotificationsWindowComponent.formatDateNumber(parseInt(diff / 60, 10))}`
+          + `The break will end in ${NotificationsWindowComponent.formatDateNumber(Math.trunc(diff / 60))}`
           + `:${NotificationsWindowComponent.formatDateNumber(diff % 60)}`;
       })
       .filter(() => until.diff(moment(), 'seconds') < 0)
-      .do(() => this.toastr.dismissToast(toast))
+      .do((toast) => this.toastr.dismissToast(toast))
       .take(1);
   }
 

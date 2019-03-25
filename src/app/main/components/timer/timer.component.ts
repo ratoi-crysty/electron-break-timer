@@ -12,20 +12,21 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./timer.component.css']
 })
 export class TimerComponent implements OnInit, OnDestroy {
-  secondsLeft: number;
-  interval: number;
-  minutes = 60;
-  duration = 5;
-  minutesLeft: number;
-  nextNotification: Moment;
-  restartSubscription: Subscription;
-
   @Output() showNotification = new EventEmitter<number>();
   @Output() hideWindow = new EventEmitter<void>();
   @Output() timeStart = new EventEmitter<number>();
   @Input() restart$: Observable<null>;
   @ViewChild('hideButton') hideButton: MatButton;
   @ViewChild('input') input: ElementRef;
+
+  secondsLeft: number;
+  interval: number | null;
+  minutes = 60;
+  duration = 5;
+  minutesLeft: number;
+  nextNotification: Moment;
+  restartSubscription: Subscription;
+  displayingNotification = false;
 
   constructor() { }
 
@@ -45,6 +46,8 @@ export class TimerComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.displayingNotification = false;
+
     this.nextNotification = moment().add(this.minutes, 'minutes');
 
     if (this.interval) {
@@ -52,7 +55,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     }
 
     this.tick();
-    this.interval = setInterval(this.tick.bind(this), 1000);
+    this.interval = +setInterval(this.tick.bind(this), 1000);
     this.timeStart.emit(this.minutes);
     setTimeout(() => {
       this.hideButton.focus();
@@ -60,6 +63,9 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   stop() {
+    if (!this.interval) {
+      return;
+    }
     clearInterval(this.interval);
     this.interval = null;
     setTimeout(() => {
@@ -78,6 +84,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     if (this.secondsLeft <= 0) {
       this.minutesLeft = this.nextNotification.diff(moment(), 'minutes');
       this.showNotification.emit(this.duration);
+      this.displayingNotification = true;
       this.stop();
     }
   }

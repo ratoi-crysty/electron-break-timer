@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { NotificationsService } from '../../notifications/services/notifications.service';
-import { Observable } from 'rxjs/Observable';
-import { NotificationModel } from '../../notifications/models/notification.model';
-import { ElectronService } from 'ngx-electron';
-import { CommunicationService } from '../../communication/services/communication.service';
-import { CommunicationDataModel } from '../../communication/models/communication-data.model';
+import {Component, OnInit} from '@angular/core';
+import {NotificationsService} from '../../notifications/services/notifications.service';
+import {Observable} from 'rxjs/Observable';
+import {NotificationModel} from '../../notifications/models/notification.model';
+import {ElectronService} from 'ngx-electron';
+import {CommunicationService} from '../../communication/services/communication.service';
+import {CommunicationDataModel} from '../../communication/models/communication-data.model';
+import 'rxjs/add/observable/fromEvent';
 
 @Component({
-  moduleId : module.id.split('\\').join('/'),
+  moduleId: module.id.split('\\').join('/'),
   selector: 'app-main-window',
   templateUrl: './main-window.component.html',
   styleUrls: ['./main-window.component.css']
@@ -17,11 +18,18 @@ export class MainWindowComponent implements OnInit {
 
   constructor(private notificationsService: NotificationsService,
               private electronService: ElectronService,
-              private communicationService: CommunicationService) { }
+              private communicationService: CommunicationService) {
+  }
 
   ngOnInit() {
     this.notificationWindowClosed$ = this.notificationsService.getNotificationWindowClosed$();
+    Observable.fromEvent(this.electronService.remote.getCurrentWindow(), 'show')
+      .subscribe(this.focusInput);
   }
+
+  focusInput = () => {
+
+  };
 
   notify(duration: number) {
     this.notificationsService.sendNotification(

@@ -1,14 +1,15 @@
 <mat-card>
   <mat-card-content>
     <h2><span *ngIf="interval">Next break in: <span *ngIf="minutesLeft">{{ minutesLeft }}m</span><span *ngIf="minutesLeft === 0">{{ secondsLeft }}s</span></span>&nbsp;</h2>
+    <h3 *ngIf="displayingNotification">Currently on break</h3>
     <form>
       <mat-form-field>
-        <input matInput type="number" placeholder="Minutes" name="minutes" required [(ngModel)]="minutes" [disabled]="interval" #input>
+        <input matInput type="number" placeholder="Minutes" name="minutes" required [(ngModel)]="minutes" [disabled]="interval || displayingNotification" #input>
       </mat-form-field>
       <mat-form-field>
-        <input matInput type="number" placeholder="Duration" name="Duration" required [(ngModel)]="duration" [disabled]="interval" #input>
+        <input matInput type="number" placeholder="Duration" name="Duration" required [(ngModel)]="duration" [disabled]="interval || displayingNotification" #input>
       </mat-form-field>
-      <div *ngIf="!interval">
+      <div *ngIf="!interval && !displayingNotification">
         <button mat-button mat-raised-button color="primary" (click)="start()">Start</button>
       </div>
       <div *ngIf="interval">
