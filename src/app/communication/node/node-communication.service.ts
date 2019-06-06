@@ -4,6 +4,9 @@ import { BaseCommunicationService } from '../util/base-communication.service';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+
 export class NodeCommunicationService extends BaseCommunicationService {
   browserWindows: BrowserWindow[];
   private communication$: Observable<CommunicationDataModel>;

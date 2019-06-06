@@ -5,14 +5,15 @@ import nodeCommunicationService from './app/communication/node/node-communicatio
 import * as path from 'path';
 import * as moment from 'moment';
 
-// Keep a global reference of the window object, if you don't, the window will
+// Keep a global reference of the win
+// dow object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: BrowserWindow | null;
 let notificationsWindow: BrowserWindow | null;
 let tray: Tray | null;
 const browserWindows: BrowserWindow[] = [];
 
-const isDevMode = process.execPath.match(/[\\/]electron/);
+const isDevMode = process.env.NODE_ENV === 'development';
 
 if (isDevMode) {
   enableLiveReload();
@@ -60,25 +61,6 @@ const createWindows = () => {
     destroyEverything();
   });
 
-  notificationsWindow = new BrowserWindow({
-    width: 310,
-    height: 80,
-    x: electron.screen.getPrimaryDisplay().size.width - 310,
-    y: 50,
-    transparent: true,
-    closable: false,
-    focusable: false,
-    skipTaskbar: true,
-    frame: false,
-    alwaysOnTop: true,
-    show: false,
-    resizable: false,
-    'node-integration': true,
-    icon: path.join(__dirname, 'save.png_64x64.png'),
-    // maximizable: false,
-    // minimizable: false,
-  });
-
   // Open the DevTools.
   if (isDevMode) {
     notificationsWindow = new BrowserWindow({
@@ -86,6 +68,24 @@ const createWindows = () => {
       height: 600,
     });
     notificationsWindow.webContents.openDevTools();
+  } else {
+    notificationsWindow = new BrowserWindow({
+      width: 310,
+      height: 80,
+      x: electron.screen.getPrimaryDisplay().size.width - 310,
+      y: 50,
+      transparent: true,
+      closable: false,
+      focusable: false,
+      skipTaskbar: true,
+      frame: false,
+      alwaysOnTop: true,
+      show: false,
+      resizable: false,
+      icon: path.join(__dirname, 'save.png_64x64.png'),
+      // maximizable: false,
+      // minimizable: false,
+    });
   }
 
   browserWindows.push(notificationsWindow);
@@ -98,13 +98,14 @@ const createWindows = () => {
 
   tray = new Tray(coffeeBreakIcon);
   tray.on('click', () => {
-    if (!mainWindow || mainWindow.isVisible()) {
-      mainWindow.focus();
-
+    if (!mainWindow) {
       return;
     }
-
-    mainWindow.show();
+    if (mainWindow.isVisible()) {
+      mainWindow.focus();
+    } else {
+      mainWindow.show();
+    }
   });
 
   tray.setToolTip('Please set the time until the next break');
