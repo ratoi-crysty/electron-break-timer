@@ -44,7 +44,9 @@ const createWindows = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 415,
-    height: 240,
+    height: 183,
+    autoHideMenuBar: true,
+    resizable: false,
   });
   browserWindows.push(mainWindow);
 
