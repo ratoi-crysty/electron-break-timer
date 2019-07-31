@@ -1,6 +1,6 @@
 {
   "name": "break-timer",
-  "productName": "break-timer",
+  "productName": "Break timer",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "src/index.ts",
