@@ -46,7 +46,7 @@ const createWindows = () => {
     width: 415,
     height: 183,
     autoHideMenuBar: true,
-    resizable: false,
+    resizable: isDevMode,
   });
   browserWindows.push(mainWindow);
 
@@ -68,12 +68,13 @@ const createWindows = () => {
     notificationsWindow = new BrowserWindow({
       width: 800,
       height: 600,
+      resizable: true,
     });
     notificationsWindow.webContents.openDevTools();
   } else {
     notificationsWindow = new BrowserWindow({
       width: 310,
-      height: 80,
+      height: 90,
       x: electron.screen.getPrimaryDisplay().size.width - 310,
       y: 50,
       transparent: true,
