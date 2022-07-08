@@ -64,7 +64,7 @@
     "electron-compile": "^6.4.4",
     "electron-devtools-installer": "^3.1.1",
     "electron-squirrel-startup": "^1.0.0",
-    "moment": "^2.20.1",
+    "moment": "^2.29.4",
     "ng2-toastr": "^4.1.2",
     "ngx-electron": "^2.2.0",
     "reflect-metadata": "^0.1.10",
